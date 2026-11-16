@@ -1,0 +1,25 @@
+# Бинарники и сборки
+bin/
+dist/
+build/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Временные файлы и логи
+*.log
+*.tmp
+.env
+
+# Зависимости
+vendor/
+node_modules/
+
+# IDE и редакторы
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
