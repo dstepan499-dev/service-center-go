@@ -1,12 +1,143 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>fixflow</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ИС «Сервисный центр»</title>
+    <link rel="stylesheet" href="/src/style.css">
 </head>
 <body>
-<div id="app"></div>
-<script src="./src/main.js" type="module"></script>
+    <!-- 1. Экран аутентификации -->
+    <div id="auth-screen" class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">🛠️</div>
+                <h2>Сервисный центр</h2>
+                <p>Вход в информационную систему</p>
+            </div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" id="username" placeholder="Введите логин" autocomplete="off" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Введите пароль" required>
+                </div>
+
+                <div id="auth-error" class="error-banner hidden"></div>
+
+                <button type="submit" id="btn-login" class="btn btn-primary btn-block">Войти в систему</button>
+            </form>
+
+            <div class="auth-hints">
+                <small>Тестовые роли: director / manager / master / warehouse / admin (пароль: [роль]123, для склада: wh123)</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Главный экран приложения (после успешного входа) -->
+    <div id="main-screen" class="app-layout hidden">
+        <!-- Шапка -->
+        <header class="app-header">
+            <div class="header-brand">
+                <span class="brand-icon">🔧</span>
+                <span class="brand-title">ИС «Сервисный центр»</span>
+            </div>
+
+            <div class="header-user">
+                <div class="user-info">
+                    <span id="user-display-name" class="user-name">Иванов И.И.</span>
+                    <span id="user-role-badge" class="role-badge">Менеджер</span>
+                </div>
+                <button id="btn-change-pass" class="btn btn-secondary btn-sm" title="Сменить пароль">🔑 Пароль</button>
+                <button id="btn-about" class="btn btn-secondary btn-sm" title="О программе">ℹ️ О программе</button>
+                <button id="btn-logout" class="btn btn-danger btn-sm">🚪 Выход</button>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Боковое адаптивное меню навигации -->
+            <aside class="app-sidebar">
+                <nav class="nav-menu">
+                    <div class="menu-label">ОСНОВНОЕ</div>
+                    <button class="nav-item active" data-tab="orders" id="nav-orders">📋 Заказы на ремонт</button>
+                    <button class="nav-item" data-tab="clients" id="nav-clients">👥 Клиенты</button>
+                    <button class="nav-item" data-tab="items" id="nav-items">📺 Техника</button>
+
+                    <div class="menu-label" id="section-warehouse">СКЛАД</div>
+                    <button class="nav-item" data-tab="parts" id="nav-parts">🔩 Запчасти</button>
+                    <button class="nav-item" data-tab="suppliers" id="nav-suppliers">🚚 Поставщики</button>
+
+                    <div class="menu-label" id="section-hr">КАДРЫ</div>
+                    <button class="nav-item" data-tab="employees" id="nav-employees">👔 Сотрудники</button>
+
+                    <div class="menu-label" id="section-analytics">АНАЛИТИКА</div>
+                    <button class="nav-item" data-tab="documents" id="nav-documents">📑 Документы и SQL</button>
+                    <button class="nav-item" data-tab="analytics" id="nav-analytics">📊 Дашборд</button>
+                </nav>
+            </aside>
+
+            <!-- Рабочая область -->
+            <main class="app-content">
+                <div id="content-area" class="content-container">
+                    <div class="welcome-card">
+                        <h3>Добро пожаловать в рабочую среду!</h3>
+                        <p id="welcome-message">Выберите пункт меню слева для начала работы.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Модальное окно смены пароля -->
+    <div id="modal-password" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Смена пароля</h3>
+                <button class="btn-close" id="btn-close-pass-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Текущий пароль</label>
+                    <input type="password" id="old-password" required>
+                </div>
+                <div class="form-group">
+                    <label>Новый пароль (мин. 6 символов)</label>
+                    <input type="password" id="new-password" required>
+                </div>
+                <div id="pass-msg" class="message-banner hidden"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-pass">Отмена</button>
+                <button class="btn btn-primary" id="btn-submit-pass">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно "О программе" (Справка) -->
+    <div id="modal-about" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>О программе</h3>
+                <button class="btn-close" id="btn-close-about-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Информационная система:</strong> «Сервисный центр по ремонту бытовой техники»</p>
+                <p><strong>Версия:</strong> 1.0.0 (Курсовой проект)</p>
+                <p><strong>Дисциплина:</strong> Базы данных</p>
+                <p><strong>Выполнил:</strong> студент гр. АВТ-412 Дружин Степан Вадимович</p>
+                <p><strong>Проверил:</strong> ассистент каф. АСУ Антонянц Е. Н.</p>
+                <p><strong>Стек:</strong> Golang, Wails v2, PostgreSQL, HTML5, CSS3, JavaScript</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btn-close-about">Понятно</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>
